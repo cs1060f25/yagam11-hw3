@@ -1,21 +1,53 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import './App.css'
+import Onboarding from './pages/OnboardingPage'
+import Dashboard from './pages/Dashboard'
+
+const routes = ['/','/onboarding','/dashboard']
 
 const App: React.FC = () => {
+  const [path, setPath] = useState<string>(window.location.pathname)
+
+  useEffect(() => {
+    const onPop = () => setPath(window.location.pathname)
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
+  const navigate = (to: string) => {
+    // Always push a history state so clicking the same link again will trigger navigation
+    // and allow pages to remount or reset as needed.
+    try {
+      history.pushState(null, '', to)
+    } catch (e) {
+      // ignore
+    }
+    setPath(to)
+  }
+
+  let content: React.ReactNode
+  if (path === '/' || path === '/onboarding') content = <Onboarding navigate={navigate} />
+  else if (path === '/dashboard') content = <Dashboard navigate={navigate} />
+  else content = (
+    <div style={{padding: 24}}>
+      <h1>Not found</h1>
+      <p>Page not recognized — try the navigation links above.</p>
+    </div>
+  )
+
   return (
-    <main style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '100vh',
-      fontFamily: 'Inter, Roboto, -apple-system, sans-serif',
-      padding: '1rem',
-    }}>
-      <h1 style={{fontSize: '3rem', margin: '0.5rem 0'}}>Hello, World!</h1>
-      <p style={{fontSize: '1.25rem', color: '#444', maxWidth: 600, textAlign: 'center'}}>
-      </p>
-    </main>
+    <div>
+      <header style={{padding: 12, borderBottom: '1px solid #eee'}}>
+        <nav style={{display: 'flex', gap: 12, alignItems: 'center'}}>
+          <a style={{cursor: 'pointer'}} onClick={() => navigate('/')}>Home</a>
+          <a style={{cursor: 'pointer'}} onClick={() => navigate('/onboarding')}>Onboarding</a>
+          <a style={{cursor: 'pointer'}} onClick={() => navigate('/dashboard')}>Dashboard</a>
+        </nav>
+      </header>
+      <div style={{padding: 16}}>
+        {content}
+      </div>
+    </div>
   )
 }
 
