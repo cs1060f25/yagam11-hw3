@@ -3,7 +3,7 @@ import './App.css'
 import Onboarding from './pages/OnboardingPage'
 import Dashboard from './pages/Dashboard'
 
-const routes = ['/','/onboarding','/dashboard']
+// const routes = ['/','/onboarding','/dashboard']
 
 const App: React.FC = () => {
   const [path, setPath] = useState<string>(window.location.pathname)
